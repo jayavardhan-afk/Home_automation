@@ -1,0 +1,71 @@
+#include <SinricPro.h>
+#include <SinricProRelay.h>
+
+#define WIFI_SSID      "your-ssid"
+#define WIFI_PASS      "your-password"
+#define APP_KEY        "your-app-key"
+#define APP_SECRET     "your-app-secret"
+
+#define RELAY1_PIN     D1  // Change these pins according to your setup
+#define RELAY2_PIN     D2
+#define RELAY3_PIN     D3
+#define RELAY4_PIN     D4
+
+SinricProRelay& myRelay1 = SinricPro[R1];
+SinricProRelay& myRelay2 = SinricPro[R2];
+SinricProRelay& myRelay3 = SinricPro[R3];
+SinricProRelay& myRelay4 = SinricPro[R4];
+
+void setup() {
+  Serial.begin(115200);
+  myRelay1.begin();
+  myRelay2.begin();
+  myRelay3.begin();
+  myRelay4.begin();
+
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(250);
+    Serial.print(".");
+  }
+  Serial.println("");
+
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void loop() {
+  myRelay1.handle();
+  myRelay2.handle();
+  myRelay3.handle();
+  myRelay4.handle();
+}
+
+bool onRelay(const String& deviceId, bool& state) {
+  Serial.printf("Device %s turned %s\r\n", deviceId.c_str(), state?"on":"off");
+  
+  if (deviceId == "relay-1-device-id") {
+    digitalWrite(RELAY1_PIN, state);
+  } else if (deviceId == "relay-2-device-id") {
+    digitalWrite(RELAY2_PIN, state);
+  } else if (deviceId == "relay-3-device-id") {
+    digitalWrite(RELAY3_PIN, state);
+  } else if (deviceId == "relay-4-device-id") {
+    digitalWrite(RELAY4_PIN, state);
+  }
+
+  return true;
+}
+
+void setupRelays() {
+  pinMode(RELAY1_PIN, OUTPUT);
+  pinMode(RELAY2_PIN, OUTPUT);
+  pinMode(RELAY3_PIN, OUTPUT);
+  pinMode(RELAY4_PIN, OUTPUT);
+
+  digitalWrite(RELAY1_PIN, HIGH);
+  digitalWrite(RELAY2_PIN, HIGH);
+  digitalWrite(RELAY3_PIN, HIGH);
+  digitalWrite(RELAY4_PIN, HIGH);
+}
